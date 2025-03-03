@@ -17,7 +17,7 @@ function fetchGameStatus() {
 
       if (users.length === 1) {
         statusContainer.innerHTML = `<p>Waiting for the other player... ${countdown} seconds remaining.</p>`;
-        choicesContainer.innerHTML = `<p>Player 1: ${users[0].name} chose ${users[0].move}</p>`;
+        // choicesContainer.innerHTML = `<p>Player 1: ${users[0].name} chose ${users[0].move}</p>`;
         resultContainer.innerHTML = "";
       } else if (users.length === 2) {
         statusContainer.innerHTML = "";
