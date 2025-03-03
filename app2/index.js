@@ -1,18 +1,41 @@
-const resultsContainer = document.getElementById("results-container");
-const countdownContainer = document.getElementById("countdown-container");
+const statusContainer = document.getElementById("status-container");
+const choicesContainer = document.getElementById("choices-container");
+const resultContainer = document.getElementById("result-container");
 
-let countdown = 0; // Counter
-let countdownInterval = null;
-
-function fetchUsers() {
+function fetchGameStatus() {
   fetch("http://localhost:5050/users")
     .then((response) => response.json())
     .then((data) => {
-      updateResults(data);
+      console.log("Server response:", data);
 
-      const result = data.find((item) => item.result);
-      if (result && !countdownInterval) {
-        startCountdown();
+      if (!data.users) {
+        console.error("Error: 'users' is undefined in the response.");
+        return;
+      }
+
+      const { users, countdown, result } = data;
+
+      if (users.length === 1) {
+        statusContainer.innerHTML = `<p>Waiting for the other player... ${countdown} seconds remaining.</p>`;
+        choicesContainer.innerHTML = `<p>Player 1: ${users[0].name} chose ${users[0].move}</p>`;
+        resultContainer.innerHTML = "";
+      } else if (users.length === 2) {
+        statusContainer.innerHTML = "";
+
+        choicesContainer.innerHTML = users
+          .map(
+            (user, index) =>
+              `<p>Player ${index + 1}: ${user.name} chose ${user.move}</p>`
+          )
+          .join("");
+
+        if (result) {
+          resultContainer.innerHTML = `<h2>${result}</h2>`;
+        }
+      } else {
+        statusContainer.innerHTML = "<p>Waiting for players...</p>";
+        choicesContainer.innerHTML = "";
+        resultContainer.innerHTML = "";
       }
     })
     .catch((error) => {
@@ -20,42 +43,4 @@ function fetchUsers() {
     });
 }
 
-function updateResults(users) {
-  resultsContainer.innerHTML = "";
-
-  if (users.length === 0) {
-    resultsContainer.innerHTML = "<p>No players yet.</p>";
-    return;
-  }
-
-  users.forEach((user, index) => {
-    if (user.name && user.move) {
-      resultsContainer.innerHTML += `<p>Player ${index + 1}: ${
-        user.name
-      } chose ${user.move}</p>`;
-    }
-  });
-
-  const result = users.find((item) => item.result);
-  if (result) {
-    resultsContainer.innerHTML += `<h2>${result.result}</h2>`;
-  }
-}
-
-function startCountdown() {
-  countdown = 10;
-  countdownInterval = setInterval(() => {
-    countdownContainer.innerHTML = `<p>Game reset in ${countdown} seconds...</p>`;
-    countdown--;
-
-    if (countdown < 0) {
-      clearInterval(countdownInterval);
-      countdownInterval = null;
-      countdownContainer.innerHTML = "";
-      resultsContainer.innerHTML = "<p>No players yet.</p>";
-    }
-  }, 1000);
-}
-
-//POLLING 1 second
-setInterval(fetchUsers, 1000);
+setInterval(fetchGameStatus, 1000);

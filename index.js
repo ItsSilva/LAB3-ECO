@@ -10,6 +10,7 @@ app.use("/app1", express.static(path.join(__dirname, "app1")));
 app.use("/app2", express.static(path.join(__dirname, "app2")));
 
 let users = [];
+let countdown = 10;
 let gameTimeout = null;
 
 function determineWinner(player1, player2) {
@@ -28,12 +29,24 @@ function determineWinner(player1, player2) {
   }
 }
 
-//GET
+function resetGame() {
+  users = [];
+  countdown = 10;
+  console.log("Game reset. Waiting for new players.");
+}
+
 app.get("/users", (req, res) => {
-  res.status(200).json(users);
+  console.log("Current users:", users);
+  console.log("Current countdown:", countdown);
+
+  let result = null;
+  if (users.length === 2) {
+    result = determineWinner(users[0], users[1]);
+  }
+
+  res.status(200).json({ users, countdown, result });
 });
 
-//POST
 app.post("/users", (req, res) => {
   const user = req.body;
 
@@ -43,15 +56,20 @@ app.post("/users", (req, res) => {
 
   users.push(user);
 
+  if (users.length === 1) {
+    gameTimeout = setInterval(() => {
+      countdown--;
+
+      if (countdown <= 0) {
+        clearInterval(gameTimeout);
+        resetGame();
+      }
+    }, 1000);
+  }
+
   if (users.length === 2) {
-    const result = determineWinner(users[0], users[1]);
-
-    users.push({ result });
-
-    gameTimeout = setTimeout(() => {
-      users = [];
-      console.log("Users array cleared after 10 seconds.");
-    }, 10000);
+    clearInterval(gameTimeout);
+    setTimeout(resetGame, 10000);
   }
 
   res.status(201).json(user);
