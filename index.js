@@ -10,6 +10,7 @@ app.use("/app1", express.static(path.join(__dirname, "app1")));
 app.use("/app2", express.static(path.join(__dirname, "app2")));
 
 let users = [];
+let gameTimeout = null;
 
 function determineWinner(player1, player2) {
   if (player1.move === player2.move) {
@@ -27,16 +28,19 @@ function determineWinner(player1, player2) {
   }
 }
 
+//GET
 app.get("/users", (req, res) => {
   res.status(200).json(users);
 });
 
+//POST
 app.post("/users", (req, res) => {
   const user = req.body;
 
   if (users.length >= 2) {
     return res.status(400).json({ message: "Only 2 players allowed." });
   }
+
   users.push(user);
 
   if (users.length === 2) {
@@ -44,7 +48,7 @@ app.post("/users", (req, res) => {
 
     users.push({ result });
 
-    setTimeout(() => {
+    gameTimeout = setTimeout(() => {
       users = [];
       console.log("Users array cleared after 10 seconds.");
     }, 10000);

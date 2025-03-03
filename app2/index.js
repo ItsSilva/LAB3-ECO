@@ -1,34 +1,61 @@
-document.getElementById("get-btn").addEventListener("click", getUsers);
+const resultsContainer = document.getElementById("results-container");
+const countdownContainer = document.getElementById("countdown-container");
 
-function getUsers() {
+let countdown = 0; // Counter
+let countdownInterval = null;
+
+function fetchUsers() {
   fetch("http://localhost:5050/users")
     .then((response) => response.json())
     .then((data) => {
-      console.log("GET response:", data);
-
-      const resultsContainer = document.getElementById("results-container");
-      resultsContainer.innerHTML = "";
-
-      if (data.length === 0) {
-        resultsContainer.innerHTML = "<p>No players yet.</p>";
-        return;
-      }
-
-      data.forEach((user, index) => {
-        if (user.name && user.move) {
-          resultsContainer.innerHTML += `<p>Player ${index + 1}: ${
-            user.name
-          } chose ${user.move}</p>`;
-        }
-      });
+      updateResults(data);
 
       const result = data.find((item) => item.result);
-      if (result) {
-        resultsContainer.innerHTML += `<h2>${result.result}</h2>`;
+      if (result && !countdownInterval) {
+        startCountdown();
       }
     })
     .catch((error) => {
       console.error("Error:", error);
-      alert("An error occurred while fetching users.");
     });
 }
+
+function updateResults(users) {
+  resultsContainer.innerHTML = "";
+
+  if (users.length === 0) {
+    resultsContainer.innerHTML = "<p>No players yet.</p>";
+    return;
+  }
+
+  users.forEach((user, index) => {
+    if (user.name && user.move) {
+      resultsContainer.innerHTML += `<p>Player ${index + 1}: ${
+        user.name
+      } chose ${user.move}</p>`;
+    }
+  });
+
+  const result = users.find((item) => item.result);
+  if (result) {
+    resultsContainer.innerHTML += `<h2>${result.result}</h2>`;
+  }
+}
+
+function startCountdown() {
+  countdown = 10;
+  countdownInterval = setInterval(() => {
+    countdownContainer.innerHTML = `<p>Game reset in ${countdown} seconds...</p>`;
+    countdown--;
+
+    if (countdown < 0) {
+      clearInterval(countdownInterval);
+      countdownInterval = null;
+      countdownContainer.innerHTML = "";
+      resultsContainer.innerHTML = "<p>No players yet.</p>";
+    }
+  }, 1000);
+}
+
+//POLLING 1 second
+setInterval(fetchUsers, 1000);

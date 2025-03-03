@@ -1,5 +1,3 @@
-document.getElementById("get-btn").addEventListener("click", getUsers);
-
 function getUsers() {
   fetch("http://localhost:5050/users")
     .then((response) => response.json())
@@ -35,4 +33,4 @@ const addUser = () => {
     .catch((error) => console.error("Error:", error));
 };
 
-document.getElementById("add-btn").addEventListener("click", addUser);
+document.getElementById("add-btn").addEventListener("click", addUser, getUsers);
