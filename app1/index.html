@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Player</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body>
+    <h1>Player</h1>
+    <form action="">
+      <label for="player1">Enter your name:</label>
+      <input type="text" id="player1" placeholder="Example: Juan" required />
+
+      <input type="radio" name="move" id="rock" value="rock" required />
+      <label class="move-card" for="rock">
+        <p>Rock 🪨</p>
+      </label>
+
+      <input type="radio" name="move" id="paper" value="paper" required />
+      <label class="move-card" for="paper">
+        <p>Paper 📄</p>
+      </label>
+
+      <input type="radio" name="move" id="scissors" value="scissors" required />
+      <label class="move-card" for="scissors">
+        <p>Scissors ✂️</p>
+      </label>
+
+      <button id="get-btn">GET</button>
+      <button id="add-btn">ADD</button>
+    </form>
+    <script src="index.js"></script>
+  </body>
+</html>
